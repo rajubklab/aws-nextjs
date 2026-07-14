@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: ${{ vars.AWS_REGION }} # Change to your AWS region
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }} # Change to your ECR repository name
-  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }} # Change to your EKS cluster name
+  AWS_REGION: ${{ vars.AWS_REGION }} # Change to your AWS region.
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }} # Change to your ECR repository name.
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }} # Change to your EKS cluster name.
 
 permissions:
   contents: read
