@@ -32,7 +32,7 @@ spec:
 
       containers:
         - name: app
-          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/aws-nextjs:latest # Replace with your ECR URL
+          image: 767469526309.dkr.ecr.ap-south-2.amazonaws.com/aws-nextjs:latest # Replace with your ECR URL
           imagePullPolicy: Always
 
           ports:
