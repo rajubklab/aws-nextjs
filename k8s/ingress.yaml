@@ -1,0 +1,66 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextjs-app
+  namespace: default
+  labels:
+    app: nextjs-app
+  annotations:
+    # AWS ALB Ingress Controller annotations
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+
+    # SSL configuration
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012 # Replace with your ACM certificate ARN
+
+    # ALB attributes
+    alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.connection.s3.enabled=true,idle_timeout.connection.s3.value=60
+
+    # Health check configuration
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "15"
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "5"
+    alb.ingress.kubernetes.io/healthy-threshold-count: "2"
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: "2"
+
+    # Tags for the load balancer
+    alb.ingress.kubernetes.io/tags: Environment=production,Application=nextjs-app
+
+    # WAF (optional - uncomment if using AWS WAF)
+    # alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:us-east-1:123456789012:global/webacl/name/id
+
+spec:
+  rules:
+    - host: app.rajubk.online
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nextjs-app
+                port:
+                  name: http
+
+  # Optional: Add default backend for other hosts
+  # defaultBackend:
+  #   service:
+  #     name: nextjs-app
+  #     port:
+  #       name: http
+
+---
+apiVersion: v1
+kind: PodDisruptionBudget
+metadata:
+  name: nextjs-app
+  namespace: default
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: nextjs-app
