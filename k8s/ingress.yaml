@@ -24,22 +24,3 @@ spec:
                 name: nextjs-app
                 port:
                   name: http
-
-  # Optional: Add default backend for other hosts
-  # defaultBackend:
-  #   service:
-  #     name: nextjs-app
-  #     port:
-  #       name: http
-
----
-apiVersion: v1
-kind: PodDisruptionBudget
-metadata:
-  name: nextjs-app
-  namespace: default
-spec:
-  minAvailable: 2
-  selector:
-    matchLabels:
-      app: nextjs-app
