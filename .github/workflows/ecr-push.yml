@@ -82,9 +82,16 @@ jobs:
 
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}  # Change cluster name
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
 
-      - name: Deploy to EKS
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/hpa.yaml
+
+      - name: Update image and deploy
         run: |
           kubectl set image deployment/nextjs-app app=${{ needs.build-and-push.outputs.image-uri }} -n default
           kubectl rollout status deployment/nextjs-app -n default --timeout=5m
