@@ -9,6 +9,7 @@ on:
 env:
   AWS_REGION: ${{ vars.AWS_REGION }} # Change to your AWS region
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }} # Change to your ECR repository name
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }} # Change to your EKS cluster name
 
 permissions:
   contents: read
@@ -81,7 +82,7 @@ jobs:
 
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name aws-nextjs-cluster  # Change cluster name
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}  # Change cluster name
 
       - name: Deploy to EKS
         run: |
