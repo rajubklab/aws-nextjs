@@ -92,5 +92,24 @@ jobs:
 
       - name: Update image and deploy
         run: |
-          kubectl set image deployment/nextjs-app app=${{ needs.build-and-push.outputs.image-uri }} -n default
+          # Get container names from the deployment
+          CONTAINERS=$(kubectl get deployment nextjs-app -n default -o jsonpath='{.spec.template.spec.containers[*].name}' 2>/dev/null || true)
+          if [ -z "$CONTAINERS" ]; then
+            echo "No existing containers found in deployment 'nextjs-app' — attempting to apply manifests again and then exit if still missing."
+            kubectl apply -f k8s/deployment.yaml -n default || true
+            CONTAINERS=$(kubectl get deployment nextjs-app -n default -o jsonpath='{.spec.template.spec.containers[*].name}' 2>/dev/null || true)
+            if [ -z "$CONTAINERS" ]; then
+              echo "Deployment 'nextjs-app' has no containers; aborting."
+              kubectl get deployments -n default || true
+              exit 1
+            fi
+          fi
+
+          # Update image for each container found
+          for c in $CONTAINERS; do
+            echo "Updating container '$c' image to ${{ needs.build-and-push.outputs.image-uri }}"
+            kubectl set image deployment/nextjs-app "$c=${{ needs.build-and-push.outputs.image-uri }}" -n default
+          done
+
+          # Wait for rollout
           kubectl rollout status deployment/nextjs-app -n default --timeout=5m
