@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: us-east-1 # Change to your AWS region
-  ECR_REPOSITORY: aws-nextjs # Change to your ECR repository name
+  AWS_REGION: ${{ vars.AWS_REGION }} # Change to your AWS region
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }} # Change to your ECR repository name
 
 permissions:
   contents: read
